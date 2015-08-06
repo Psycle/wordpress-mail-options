@@ -1,0 +1,6 @@
+{
+    "name": "psycle-wordpress-plugins/mail-options",
+    "type": "wordpress-plugin",
+    "version": "dev-master",
+	"minimum-stability": "dev"
+}
