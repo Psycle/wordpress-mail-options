@@ -2,5 +2,14 @@
     "name": "psycle-wordpress-plugins/mail-options",
     "type": "wordpress-muplugin",
     "version": "dev-master",
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
+	"autoload"         : {
+		"psr-0": {
+			"Psycle\\MailOptions\\": "src/"
+		}
+	},
+	"scripts": {
+		"post-update-cmd": "Psycle\\MailOptions\\PostInstall::run()",
+		"post-install-cmd": "Psycle\\MailOptions\\PostInstall::run()"	
+	}
 }
