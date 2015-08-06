@@ -2,9 +2,5 @@
     "name": "psycle-wordpress-plugins/mail-options",
     "type": "wordpress-muplugin",
     "version": "dev-master",
-	"minimum-stability": "dev",
-	"scripts": {
-		"post-update-cmd": "cp psycle_mail.php ../",
-		"post-install-cmd": "cp psycle_mail.php ../"	
-	}
+	"minimum-stability": "dev"
 }
