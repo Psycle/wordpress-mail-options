@@ -5,6 +5,7 @@
   Description: Filters required for mail functions in wordpress.
   Version: 0.1
   Author: James Robinson <james.robinson@psycle.com>
+  License: GPLv2 or later
   Network: True
  */
 
