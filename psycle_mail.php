@@ -5,7 +5,6 @@
   Description: Filters required for mail functions in wordpress.
   Version: 0.1
   Author: James Robinson <james.robinson@psycle.com>
-  License: GPLv2 or later
   Network: True
  */
 
@@ -14,7 +13,7 @@ namespace Psycle\WordPress\Mu;
 MailOptions::getInstance()->init();
 
 class MailOptions {
-
+	protected $_reply_to_set = false;
 	protected $_option_page_slug = 'psycle_mail_options';
 	protected $_form_post_array_name = 'psycle_mail';
 	protected $_option_prefix = '_psycle_mail_';
@@ -36,8 +35,13 @@ class MailOptions {
 		),
 		'sender' => array(
 			'type' => 'email',
-			'label' => 'Sender',
-			'description' => 'The Sender email (Return-Path) of the message. <br>If not empty, will be sent via -f to sendmail or as \'MAIL FROM\' in smtp mode.'
+			'label' => 'Reply-To address',
+			'description' => 'The Sender email (Return-Path) of the message. <br>If not empty, will be sent via -f to sendmail or as \'MAIL FROM\' in smtp mode. This will become the \'Reply-To\' address if one isn\'t already set.'
+		),
+		'reply_to_name' => array(
+			'type' => 'email',
+			'label' => 'Reply-To name',
+			'description' => 'TThis will become the \'Reply-To\' name if one isn\'t already set.'
 		),
 	);
 
@@ -78,6 +82,28 @@ class MailOptions {
 		\add_action( 'phpmailer_init', array( $this, 'actionPhpMailerInit' ) );
 		\add_action( 'admin_init', array( $this, 'actionInit' ) );
 		\add_filter( 'psycle_mail_form_fields', array( $this, 'filterPsycleMailFormFields' ), 1, 1 );
+		\add_filter( 'wp_mail', array( $this, 'filterWpMail' ), 1, 1);		
+	}
+	
+	/**
+	 * We want to check any custom headers passed to the wp_mail function so that we don't add a second Reply-To address.
+	 * 
+	 * @param array $args
+	 */
+	public function filterWpMail($args) {
+		$headers = $args['headers'];
+		$this->_reply_to_set = false;
+		if( is_string( $headers ) ) {
+			if(preg_match('@Reply\-To\:@', $headers)) {
+				$this->_reply_to_set = true;
+			}
+		} elseif( is_array( $headers ) ) {
+			foreach ($headers AS $header) {
+				if(preg_match('@Reply\-To\:@', $header)) {
+					$this->_reply_to_set = true;
+				}
+			}
+		}		
 	}
 	
 	/**
@@ -93,15 +119,17 @@ class MailOptions {
 			if(empty($this->getOption( 'sender' ))) {
 				$phpMailer->set( 'Sender', $originalFrom );
 			} else {
-				$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );
-				$phpMailer->AddReplyTo( $this->getOption( 'sender' ) );
+				$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );		
 			}
 		} else {
 			$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );
-			$phpMailer->AddReplyTo( $this->getOption( 'sender' ) );
 		}		
 		
-		$phpMailer->ReturnPath = $this->getOption( 'return_path' );		
+		$phpMailer->ReturnPath = $this->getOption( 'return_path' );	
+		
+		if(!$this->_reply_to_set) {
+			$phpMailer->AddReplyTo( $this->getOption( 'sender' ), $this->getOption( 'reply_to_name', $this->getOption( 'from_name' ) ) );
+		}		
 	}
 
 	/**
