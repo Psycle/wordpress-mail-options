@@ -1,7 +1,7 @@
 {
     "name": "psycle-wordpress-plugins/mail-options",
     "type": "wordpress-muplugin",
-	"minimum-stability": "dev"
+	"minimum-stability": "dev",
     "require": {
         "php": ">=5.3.0"
     },
