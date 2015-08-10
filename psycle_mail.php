@@ -116,7 +116,8 @@ class MailOptions {
 		
 		
 		if(empty($phpMailer->Sender) && $originalFrom != 'wordpress@' . $this->getHostName()) {
-			if(empty($this->getOption( 'sender' ))) {
+			$sender = $this->getOption( 'sender' );
+			if(empty($sender)) {
 				$phpMailer->set( 'Sender', $originalFrom );
 			} else {
 				$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );		
