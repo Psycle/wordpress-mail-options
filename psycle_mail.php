@@ -13,6 +13,7 @@ namespace Psycle\WordPress\Mu;
 MailOptions::getInstance()->init();
 
 class MailOptions {
+
 	protected $_reply_to_set = false;
 	protected $_option_page_slug = 'psycle_mail_options';
 	protected $_form_post_array_name = 'psycle_mail';
@@ -82,55 +83,59 @@ class MailOptions {
 		\add_action( 'phpmailer_init', array( $this, 'actionPhpMailerInit' ) );
 		\add_action( 'admin_init', array( $this, 'actionInit' ) );
 		\add_filter( 'psycle_mail_form_fields', array( $this, 'filterPsycleMailFormFields' ), 1, 1 );
-		\add_filter( 'wp_mail', array( $this, 'filterWpMail' ), 1, 1);		
+		\add_filter( 'wp_mail', array( $this, 'filterWpMail' ), 1, 1 );
 	}
-	
+
 	/**
 	 * We want to check any custom headers passed to the wp_mail function so that we don't add a second Reply-To address.
 	 * 
 	 * @param array $args
 	 */
-	public function filterWpMail($args) {
-		$headers = $args['headers'];
+	public function filterWpMail( $args ) {
+		$headers = $args[ 'headers' ];
 		$this->_reply_to_set = false;
-		if( is_string( $headers ) ) {
-			if(preg_match('@Reply\-To\:@', $headers)) {
+		if ( is_string( $headers ) ) {
+			if ( preg_match( '@Reply\-To\:@', $headers ) ) {
 				$this->_reply_to_set = true;
 			}
-		} elseif( is_array( $headers ) ) {
-			foreach ($headers AS $header) {
-				if(preg_match('@Reply\-To\:@', $header)) {
+		} elseif ( is_array( $headers ) ) {
+			foreach ( $headers AS $header ) {
+				if ( preg_match( '@Reply\-To\:@', $header ) ) {
 					$this->_reply_to_set = true;
 				}
 			}
-		}		
+		}
 	}
-	
+
 	/**
 	 * Callback used to modify PHPMailer headers before sending.
 	 */
-	public function actionPhpMailerInit( \PHPMailer &$phpMailer ) {		
+	public function actionPhpMailerInit( \PHPMailer &$phpMailer ) {
 		$originalFrom = $phpMailer->From;
 		$phpMailer->set( 'From', $this->getOption( 'from' ) );
 		$phpMailer->set( 'FromName', $this->getOption( 'from_name' ) );
-		
-		
-		if(empty($phpMailer->Sender) && $originalFrom != 'wordpress@' . $this->getHostName()) {
-			$sender = $this->getOption( 'sender' );
-			if(empty($sender)) {
+
+		$senderAddress = $this->getOption( 'sender' );
+
+		if ( empty( $phpMailer->Sender ) && $originalFrom != 'wordpress@' . $this->getHostName() ) {
+			if ( !$phpMailer->validateAddress( $senderAddress ) ) {
 				$phpMailer->set( 'Sender', $originalFrom );
 			} else {
-				$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );		
+				$phpMailer->set( 'Sender', $senderAddress );
 			}
-		} else {
-			$phpMailer->set( 'Sender', $this->getOption( 'sender' ) );
-		}		
+		} elseif ( $phpMailer->validateAddress( $senderAddress ) ) {
+			$phpMailer->set( 'Sender', $senderAddress );
+		}
+
+		$returnPath = $this->getOption( 'return_path' );
+		if($phpMailer->validateAddress( $returnPath)) {
+			$phpMailer->ReturnPath = $this->getOption( 'return_path' );
+		}
 		
-		$phpMailer->ReturnPath = $this->getOption( 'return_path' );	
 		$replyToOption = $this->getOption( 'sender' );
-		if(!$this->_reply_to_set && !empty($replyToOption)) {
+		if ( !$this->_reply_to_set && !empty( $replyToOption ) ) {
 			$phpMailer->AddReplyTo( $replyToOption, $this->getOption( 'reply_to_name', $this->getOption( 'from_name' ) ) );
-		}		
+		}
 	}
 
 	/**
@@ -153,16 +158,16 @@ class MailOptions {
 		}
 		return $formFields;
 	}
-	
+
 	/**
 	 * Get the default hostname for mail and allow other plugins to filter it.
 	 * 
 	 * @return string
 	 */
 	public function getDefaultMailDomain() {
-		return apply_filters('psycle_mail_mail_domain', $this->getHostName());
+		return apply_filters( 'psycle_mail_mail_domain', $this->getHostName() );
 	}
-	
+
 	/**
 	 * Get the host name for the site.
 	 * 
@@ -170,7 +175,7 @@ class MailOptions {
 	 */
 	public function getHostName() {
 		$urlParts = parse_url( home_url() );
-		return isset($urlParts[ 'host' ]) ? $urlParts[ 'host' ] : 'localhost';
+		return isset( $urlParts[ 'host' ] ) ? $urlParts[ 'host' ] : 'localhost';
 	}
 
 	/**
@@ -216,8 +221,8 @@ class MailOptions {
 				echo sprintf( '<input type="%1$s" name="%2$s" value="%3$s" size="%4$s">', $type, $this->getOptionKey( $name ), $this->getOption( $name ), $size );
 				break;
 		}
-		if(isset($formFieldSettings['description'])) {
-			echo '<p class="description">' . $formFieldSettings['description'] . '</p>';
+		if ( isset( $formFieldSettings[ 'description' ] ) ) {
+			echo '<p class="description">' . $formFieldSettings[ 'description' ] . '</p>';
 		}
 	}
 
