@@ -129,7 +129,7 @@ class MailOptions {
 		$phpMailer->ReturnPath = $this->getOption( 'return_path' );	
 		$replyToOption = $this->getOption( 'sender' );
 		if(!$this->_reply_to_set && !empty($replyToOption)) {
-			$phpMailer->AddReplyTo( $this->getOption( 'sender' ), $this->getOption( 'reply_to_name', $this->getOption( 'from_name' ) ) );
+			$phpMailer->AddReplyTo( $replyToOption, $this->getOption( 'reply_to_name', $this->getOption( 'from_name' ) ) );
 		}		
 	}
 
