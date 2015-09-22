@@ -104,7 +104,11 @@ class MailOptions {
 	public function actionPhpMailerInit( \PHPMailer &$phpMailer ) {
 		$originalFrom = $phpMailer->From;
 		$phpMailer->set( 'From', $this->getOption( 'from' ) );
-		$phpMailer->set( 'FromName', $this->getOption( 'from_name' ) );
+		
+		$fromName = $this->getOption( 'from_name' );
+		if(!empty($fromName)) {
+			$phpMailer->set( 'FromName', $fromName );
+		}
 
 		$senderAddress = $this->getOption( 'sender' );
 
@@ -156,7 +160,9 @@ class MailOptions {
 	 * @return string
 	 */
 	public function getDefaultMailDomain() {
-		return apply_filters( 'psycle_mail_mail_domain', $this->getHostName() );
+		$hostname = $this->getHostName();
+		$hostname = preg_replace('@^www\.@','',$hostname);
+		return apply_filters( 'psycle_mail_mail_domain', $hostname );
 	}
 
 	/**
@@ -239,6 +245,8 @@ class MailOptions {
 			$default = isset( $fields[ $option ][ 'default' ] ) ? $fields[ $option ][ 'default' ] : null;
 		}
 		$value = \get_option( $optionKey, $default );
+        $value = \apply_filters( 'psycle_mailer_option_' . $option, $value );
+        
 		return $value;
 	}
 
