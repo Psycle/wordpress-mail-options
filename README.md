@@ -14,3 +14,6 @@ This plugin is available via Composer/Packagist (using semantic versioning), so 
 
 composer require psycle-wordpress-plugins/mail-options
 
+## New releases
+
+New release tags pushed to this gitlab repository will automatically be pushed to the packagist.org composer repository. This is achieved using a built in gitlab hook.
