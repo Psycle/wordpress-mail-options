@@ -16,4 +16,4 @@ composer require psycle-wordpress-plugins/mail-options
 
 ## New releases
 
-New release tags pushed to this gitlab repository will automatically be pushed to the packagist.org composer repository. This is achieved using a built in gitlab hook.
+New release tags pushed to the gitlab repository (https://github.com/Psycle/wordpress-plugin-mail-option) will automatically be pushed to the packagist.org composer repository. This is achieved using a built in gitlab hook.
