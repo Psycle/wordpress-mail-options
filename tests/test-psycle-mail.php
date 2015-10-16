@@ -255,12 +255,12 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$phpMailer->Sender = $this->ValidEmailTwo;
 
 		$mailOptions->set_reply_to_set( false );
-		$mailOptions->set_option( 'sender', $this->validEmailOne );
+		$mailOptions->set_option( 'from', $this->validEmailOne );
 		$mailOptions->action_php_mailerinit( $phpMailer );
 		$headers = $phpMailer->createHeader();
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at example.org" <webmaster@example.org>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at example.org" <validsender@example.org>', $headers );
+		$this->assertContains( 'From: "Webmaster at example.org" <validsender@example.org>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at example.org" <webmaster@example.org>', $headers );
 	}
 
 	/**
@@ -273,13 +273,13 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$phpMailer->Sender = null;
 
 		$mailOptions->set_reply_to_set( false );
-		$mailOptions->set_option( 'sender', $this->validEmailOne );
+		$mailOptions->set_option( 'from', $this->validEmailOne );
 		$mailOptions->action_php_mailerinit( $phpMailer );
 		$headers = $phpMailer->createHeader();
 
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at example.org" <webmaster@example.org>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at example.org" <validsender@example.org>', $headers );
+		$this->assertContains( 'From: "Webmaster at example.org" <validsender@example.org>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at example.org" <webmaster@example.org>', $headers );
 	}
 
 	/**
@@ -292,7 +292,7 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$phpMailer->setFrom( $this->validEmailThree );
 		$phpMailer->Sender = null;
 
-		$mailOptions->set_option( 'sender', '!nv41D S£N0£R^^^@' );
+		$mailOptions->set_option( 'from', '!nv41D S£N0£R^^^@' );
 		$mailOptions->action_php_mailerinit( $phpMailer );
 		$this->assertEquals( $this->validEmailThree, $phpMailer->Sender );
 	}
