@@ -303,7 +303,7 @@ class MailOptions {
 		// We only want to set options that are used by this plugin.
 		if ( array_key_exists( $option, $this->get_option_form_fields() ) ) {
 			$optionKey = $this->get_option_key( $option );
-			\update_option( $optionKey, $value );
+			\update_option( $optionKey, $value, true );
 		}
 	}
 

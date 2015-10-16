@@ -3,6 +3,7 @@ git clone https://github.com/tierra/wordpress.git /tmp/wordpress;
 # git clone . "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG";
 cd /tmp/wordpress;
 git checkout $WP_VERSION;
+mysql -X -e "DROP DATABASE IF EXISTS wordpress_tests;" -uroot -proot;
 mysql -X -e "CREATE DATABASE wordpress_tests;" -uroot -proot;
 cp wp-tests-config-sample.php wp-tests-config.php;
 sed -i bak "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php;
