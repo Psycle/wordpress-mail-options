@@ -29,7 +29,7 @@ define( 'TEST_PLUGIN_FILE', dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'psycle-m
  * We are loading this so that we can add our tests filter
  * to load the plugin, using tests_add_filter().
  */
-require_once WP_TESTS_DIR . 'wp-includes/functions.php';
+require_once WP_TESTS_DIR . 'includes/functions.php';
 
 /**
  * Manually load the plugin main file.
