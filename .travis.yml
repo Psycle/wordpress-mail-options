@@ -41,7 +41,7 @@ before_script:
     - mv $PLUGIN_SLUG "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     - cd /tmp/wordpress
     - git checkout $WP_VERSION
-    - mysql -e "CREATE DATABASE wordpress_tests;" -uroot
+    - mysql -X -e "CREATE DATABASE wordpress_tests;" -uroot
     - cp wp-tests-config-sample.php wp-tests-config.php
     - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
     - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
@@ -49,4 +49,7 @@ before_script:
     - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG/tests"
 
 script: phpunit
+
+after_script:
+    - mysql -X -e "USE wordpress_tests; SHOW TABLES;" -uroot
 
