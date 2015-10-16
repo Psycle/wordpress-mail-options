@@ -11,7 +11,7 @@
  */
 $testDir = getenv( 'WP_TESTS_DIR' );
 if ( empty( $testDir ) ) {
-	throw new Exception( 'WP_TESTS_DIR environment variable must be set.' );
+	$testDir = '/tmp/wordpress/tests/phpunit/';
 }
 if ( DIRECTORY_SEPARATOR != substr( $testDir, - 1, 1 ) ) {
 	$testDir = $testDir . DIRECTORY_SEPARATOR;

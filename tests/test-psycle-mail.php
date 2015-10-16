@@ -23,21 +23,21 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @var string
 	 */
-	public $validEmailOne = 'validsender@example.com';
+	public $validEmailOne = 'validsender@example.org';
 
 	/**
 	 * A valid email address
 	 *
 	 * @var string
 	 */
-	public $ValidEmailTwo = 'validsender2@example.com';
+	public $ValidEmailTwo = 'validsender2@example.org';
 
 	/**
 	 * The original from address for testing.
 	 *
 	 * @var string
 	 */
-	public $validEmailThree = 'originalfrom@example.com';
+	public $validEmailThree = 'originalfrom@example.org';
 
 	/**
 	 * An invalid email address for testing email validation.
@@ -57,28 +57,28 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 					'type' => 'email',
 					'label' => 'From email',
 					'description' => 'The From email address for the message.',
-					'default' => 'webmaster@wptests.psycle.com',
+					'default' => 'webmaster@example.org',
 				),
 				'from_name' =>
 				array(
 					'type' => 'text',
 					'label' => 'From name',
 					'description' => 'The From name of the message.',
-					'default' => 'Webmaster at wptests.psycle.com',
+					'default' => 'Webmaster at example.org',
 				),
 				'return_path' =>
 				array(
 					'type' => 'email',
 					'label' => 'Return path',
 					'description' => 'The Return-Path of the message.<br>If empty, it will be set to either From or Sender.',
-					'default' => 'webmaster@wptests.psycle.com',
+					'default' => 'webmaster@example.org',
 				),
 				'sender' =>
 				array(
 					'type' => 'email',
 					'label' => 'Reply-To address',
 					'description' => 'The Sender email (Return-Path) of the message. <br>If not empty, will be sent via -f to sendmail or as \'MAIL FROM\' in smtp mode. This will become the \'Reply-To\' address if one isn\'t already set.',
-					'default' => 'webmaster@wptests.psycle.com',
+					'default' => 'webmaster@example.org',
 				),
 				'reply_to_name' =>
 				array(
@@ -110,16 +110,16 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 
 			switch ( $name ) {
 				case 'from':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_from" value="webmaster@wptests.psycle.com" size="60"><p class="description">The From email address for the message.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="_psycle_mail_from" value="webmaster@example.org" size="60"><p class="description">The From email address for the message.</p></phpunitroot>';
 					break;
 				case 'from_name':
-					$expected = '<phpunitroot><input type="text" name="_psycle_mail_from_name" value="Webmaster at wptests.psycle.com" size="60"><p class="description">The From name of the message.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="text" name="_psycle_mail_from_name" value="Webmaster at example.org" size="60"><p class="description">The From name of the message.</p></phpunitroot>';
 					break;
 				case 'return_path':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_return_path" value="webmaster@wptests.psycle.com" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="_psycle_mail_return_path" value="webmaster@example.org" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p></phpunitroot>';
 					break;
 				case 'sender':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_sender" value="webmaster@wptests.psycle.com" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="_psycle_mail_sender" value="webmaster@example.org" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p></phpunitroot>';
 					break;
 				case 'reply_to_name':
 					$expected = '<phpunitroot><input type="email" name="_psycle_mail_reply_to_name" value="" size="60"><p class="description">This will become the &#039;Reply-To&#039; name if one isn&#039;t already set.</p></phpunitroot>';
@@ -204,7 +204,7 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		 * The get_reply_to_set() method should return true in this case.
 		 */
 		$args = array(
-			'headers' => 'Reply-To: test@example.com' . PHP_EOL,
+			'headers' => 'Reply-To: test@example.org' . PHP_EOL,
 		);
 		$filteredArgs = $mailOptions->filter_wp_mail( $args );
 		$this->assertEquals( $args, $filteredArgs );
@@ -237,7 +237,7 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		 */
 		$args = array(
 			'headers' => array(
-				'Reply-To: test@example.com',
+				'Reply-To: test@example.org',
 			),
 		);
 		$filteredArgs = $mailOptions->filter_wp_mail( $args );
@@ -259,8 +259,8 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$mailOptions->action_php_mailerinit( $phpMailer );
 		$headers = $phpMailer->createHeader();
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at wptests.psycle.com" <webmaster@wptests.psycle.com>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at wptests.psycle.com" <validsender@example.com>', $headers );
+		$this->assertContains( 'From: "Webmaster at example.org" <webmaster@example.org>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at example.org" <validsender@example.org>', $headers );
 	}
 
 	/**
@@ -278,8 +278,8 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$headers = $phpMailer->createHeader();
 
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at wptests.psycle.com" <webmaster@wptests.psycle.com>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at wptests.psycle.com" <validsender@example.com>', $headers );
+		$this->assertContains( 'From: "Webmaster at example.org" <webmaster@example.org>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at example.org" <validsender@example.org>', $headers );
 	}
 
 	/**
