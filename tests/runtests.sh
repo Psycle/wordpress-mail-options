@@ -1,3 +1,4 @@
+php --version;
 export PLUGIN_SLUG=$(basename $(pwd));
 git clone https://github.com/tierra/wordpress.git /tmp/wordpress;
 # git clone . "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG";

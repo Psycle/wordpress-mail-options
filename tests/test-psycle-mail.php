@@ -46,6 +46,12 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 	 */
 	public $invalidEmail = 'invalidS£nd3r!!!';
 
+	public function setUp() {
+		add_filter('psycle_mail_option_prefix', function () {
+			return 'psy_mail_options_' . rand(0,999);
+		});
+	}
+
 	/**
 	 * Test form field filter callback.
 	 */
