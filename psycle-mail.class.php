@@ -288,6 +288,7 @@ class MailOptions {
 			$default = isset( $fields[ $option ]['default'] ) ? $fields[ $option ]['default'] : null;
 		}
 		$value = \get_option( $optionKey, $default );
+		error_log($option . ' => ' . $optionKey . ' => ' . $value);
 		$value = \apply_filters( 'psycle_mailer_option_' . $option, $value );
 
 		return $value;
