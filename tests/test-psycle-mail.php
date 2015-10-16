@@ -116,22 +116,22 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 
 			switch ( $name ) {
 				case 'from':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_from" value="webmaster@example.org" size="60"><p class="description">The From email address for the message.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'from" value="webmaster@example.org" size="60"><p class="description">The From email address for the message.</p></phpunitroot>';
 					break;
 				case 'from_name':
-					$expected = '<phpunitroot><input type="text" name="_psycle_mail_from_name" value="Webmaster at example.org" size="60"><p class="description">The From name of the message.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="text" name="' . MailOptions::get_instance()->get_option_prefix() . 'from_name" value="Webmaster at example.org" size="60"><p class="description">The From name of the message.</p></phpunitroot>';
 					break;
 				case 'return_path':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_return_path" value="webmaster@example.org" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'return_path" value="webmaster@example.org" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p></phpunitroot>';
 					break;
 				case 'sender':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_sender" value="webmaster@example.org" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'sender" value="webmaster@example.org" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p></phpunitroot>';
 					break;
 				case 'reply_to_name':
-					$expected = '<phpunitroot><input type="email" name="_psycle_mail_reply_to_name" value="" size="60"><p class="description">This will become the &#039;Reply-To&#039; name if one isn&#039;t already set.</p></phpunitroot>';
+					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'reply_to_name" value="" size="60"><p class="description">This will become the &#039;Reply-To&#039; name if one isn&#039;t already set.</p></phpunitroot>';
 					break;
 				case 'textarea_test':
-					$expected = '<phpunitroot><textarea name="_psycle_mail_textarea_test"></textarea><p class="description">Testing text area field</p></phpunitroot>';
+					$expected = '<phpunitroot><textarea name="' . MailOptions::get_instance()->get_option_prefix() . 'textarea_test"></textarea><p class="description">Testing text area field</p></phpunitroot>';
 					break;
 			}
 			$this->assertEquals( $expected,$field );
@@ -164,7 +164,7 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$expectedFilters = array(
 			'phpmailer_init' => array( $mailOptions, 'action_php_mailerinit' ),
 			'admin_init' => array( $mailOptions, 'action_init' ),
-			'psycle_mail_form_fields' => array( $mailOptions, 'filter_psycle_mail_form_fields' ),
+			'psycle_mail_form_fields' => array( $mailOptions, 'filter' . MailOptions::get_instance()->get_option_prefix() . 'form_fields' ),
 			'wp_mail' => array( $mailOptions, 'filter_wp_mail' ),
 		);
 
