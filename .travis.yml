@@ -48,8 +48,3 @@ before_script:
     - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG/tests"
 
 script: phpunit
-
-after_script:
-    - mysql -X -e "USE wordpress_tests; SHOW TABLES;" -uroot
-    - mysql -X -e "USE wordpress_tests; SELECT * FROM wptests_options;" -uroot
-

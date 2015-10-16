@@ -1,5 +1,7 @@
 # WordPress Mail Options Plugin
 
+[![Build Status](https://travis-ci.org/Psycle/wordpress-plugin-mail-options.svg)](https://travis-ci.org/Psycle/wordpress-plugin-mail-options)
+
 ## About
 
 This plugin hooks into the wp_mail() function and overrides the From address.
