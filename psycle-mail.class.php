@@ -153,7 +153,7 @@ class MailOptions {
 		}
 
 		if ( ! $phpMailer->validateAddress( $fromAddress ) ) {
-			error_log( 'Mail options plugin has invalid from address specified');
+			error_log( 'Mail options plugin has invalid from address specified' );
 			$phpMailer->Sender = $originalFrom;
 		} else {
 			$phpMailer->Sender = $fromAddress;
