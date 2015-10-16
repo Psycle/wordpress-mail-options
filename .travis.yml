@@ -36,6 +36,7 @@ matrix:
 # Clones WordPress and configures our testing environment.
 before_script:
     - export PLUGIN_SLUG=$(basename $(pwd))
+    - svn co http://develop.svn.wordpress.org/trunk/tests/phpunit /tmp/wordpress_tests
     - git clone https://github.com/tierra/wordpress.git /tmp/wordpress
 # - git clone . "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG"
     - cd ..
