@@ -154,7 +154,7 @@ class MailOptions {
 		}
 
 		$senderAddress = $this->get_option( 'sender' );
-
+		error_log($senderAddress);
 		if ( empty( $phpMailer->Sender ) && 'wordpress@' . $this->get_host_name() != $originalFrom ) {
 			if ( ! $phpMailer->validateAddress( $senderAddress ) ) {
 				$phpMailer->set( 'Sender', $originalFrom );

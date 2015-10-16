@@ -285,7 +285,7 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Testing the action_php_mailerinit function.
 	 */
-	public function DISABLEDtest_action_php_mailerinit_invalid_sender() {
+	public function test_action_php_mailerinit_invalid_sender() {
 		$mailOptions = MailOptions::get_instance();
 
 		$phpMailer = new PHPMailer();
