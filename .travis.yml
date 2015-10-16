@@ -45,6 +45,15 @@ before_script:
     - sed -i "s/youremptytestdbnamehere/wordpress_tests/" wp-tests-config.php
     - sed -i "s/yourusernamehere/travis/" wp-tests-config.php
     - sed -i "s/yourpasswordhere//" wp-tests-config.php
+    - pyrus install pear/PHP_CodeSniffer
+    - phpenv rehash
+    - mkdir /tmp/wpcs
+    - cd /tmp/wpcs
+    - git clone -b master https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git .
+    - phpcs --config-set installed_paths /tmp/wpcs
     - cd "/tmp/wordpress/src/wp-content/plugins/$PLUGIN_SLUG/tests"
 
-script: phpunit
+script:
+    - phpunit
+    - cd ../
+    - phpcs --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
