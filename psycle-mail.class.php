@@ -157,12 +157,12 @@ class MailOptions {
 
 		if ( empty( $phpMailer->Sender ) && 'wordpress@' . $this->get_host_name() != $originalFrom ) {
 			if ( ! $phpMailer->validateAddress( $senderAddress ) ) {
-				$phpMailer->set( 'Sender', $originalFrom );
+				$phpMailer->Sender = $originalFrom;
 			} else {
-				$phpMailer->set( 'Sender', $senderAddress );
+				$phpMailer->Sender = $senderAddress;
 			}
 		} elseif ( $phpMailer->validateAddress( $senderAddress ) ) {
-			$phpMailer->set( 'Sender', $senderAddress );
+			$phpMailer->Sender = $senderAddress;
 		}
 
 		$returnPath = $this->get_option( 'return_path' );
@@ -288,7 +288,6 @@ class MailOptions {
 			$default = isset( $fields[ $option ]['default'] ) ? $fields[ $option ]['default'] : null;
 		}
 		$value = \get_option( $optionKey, $default );
-		error_log($option . ' => ' . $optionKey . ' => ' . $value);
 		$value = \apply_filters( 'psycle_mailer_option_' . $option, $value );
 
 		return $value;
