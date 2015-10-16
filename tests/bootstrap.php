@@ -11,7 +11,7 @@
  */
 $testDir = getenv( 'WP_TESTS_DIR' );
 if ( empty( $testDir ) ) {
-	$testDir = '/tmp/wordpress/tests/phpunit/tests';
+	$testDir = '/tmp/wordpress/tests/phpunit/';
 }
 if ( DIRECTORY_SEPARATOR != substr( $testDir, - 1, 1 ) ) {
 	$testDir = $testDir . DIRECTORY_SEPARATOR;
