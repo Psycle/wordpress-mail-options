@@ -281,21 +281,22 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$this->assertContains( 'From: "Webmaster at example.org" <webmaster@example.org>', $headers );
 		$this->assertContains( 'Reply-To: "Webmaster at example.org" <validsender@example.org>', $headers );
 	}
-	//
-	// **
-	// * Testing the action_php_mailerinit function.
-	// */
-	// public function test_action_php_mailerinit_invalid_sender() {
-	// $mailOptions = MailOptions::get_instance();
-	//
-	// $phpMailer = new PHPMailer();
-	// $phpMailer->setFrom( $this->validEmailThree );
-	// $phpMailer->Sender = null;
-	//
-	// $mailOptions->set_option( 'sender', '!nv41D S£N0£R^^^@' );
-	// $mailOptions->action_php_mailerinit( $phpMailer );
-	// $this->assertEquals( $this->validEmailThree, $phpMailer->Sender );
-	// }
+
+	/**
+	 * Testing the action_php_mailerinit function.
+	 */
+	public function test_action_php_mailerinit_invalid_sender() {
+		$mailOptions = MailOptions::get_instance();
+
+		$phpMailer = new PHPMailer();
+		$phpMailer->setFrom( $this->validEmailThree );
+		$phpMailer->Sender = null;
+
+		$mailOptions->set_option( 'sender', '!nv41D S£N0£R^^^@' );
+		$mailOptions->action_php_mailerinit( $phpMailer );
+		$this->assertEquals( $this->validEmailThree, $phpMailer->Sender );
+	}
+
 	/**
 	 * Test that the init action adds the settings section to wp_admin general
 	 */
