@@ -145,24 +145,18 @@ class MailOptions {
 	 */
 	public function action_php_mailerinit( \PHPMailer &$phpMailer ) {
 		$originalFrom = $phpMailer->From;
-		$phpMailer->set( 'From', $this->get_option( 'from' ) );
-
+		$fromAddress = $this->get_option( 'from' );
 		$fromName = $this->get_option( 'from_name' );
 
 		if ( ! empty( $fromName ) ) {
 			$phpMailer->set( 'FromName', $fromName );
 		}
 
-		$senderAddress = $this->get_option( 'sender' );
-
-		if ( empty( $phpMailer->Sender ) && 'wordpress@' . $this->get_host_name() != $originalFrom ) {
-			if ( ! $phpMailer->validateAddress( $senderAddress ) ) {
-				$phpMailer->Sender = $originalFrom;
-			} else {
-				$phpMailer->Sender = $senderAddress;
-			}
-		} elseif ( $phpMailer->validateAddress( $senderAddress ) ) {
-			$phpMailer->Sender = $senderAddress;
+		if ( ! $phpMailer->validateAddress( $fromAddress ) ) {
+			error_log( 'Mail options plugin has invalid from address specified');
+			$phpMailer->Sender = $originalFrom;
+		} else {
+			$phpMailer->Sender = $fromAddress;
 		}
 
 		$returnPath = $this->get_option( 'return_path' );
@@ -174,6 +168,7 @@ class MailOptions {
 		if ( ! $this->_reply_to_set && ! empty( $replyToOption ) ) {
 			$phpMailer->AddReplyTo( $replyToOption, $this->get_option( 'reply_to_name', $this->get_option( 'from_name' ) ) );
 		}
+		$phpMailer->set( 'From', $fromAddress );
 	}
 
 	/**
