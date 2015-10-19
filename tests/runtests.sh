@@ -85,7 +85,7 @@ for i in ${WP_VERSIONS[@]}; do
     echo " "
 done
 
-title="| Running phpcs on ${BASE_DIR} |"
+title="| Running phpcs on ${PLUGIN_SLUG} |"
 size=${#title}
 printf %${size}s |tr " " "="
 echo " "
