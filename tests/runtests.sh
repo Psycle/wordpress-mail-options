@@ -1,3 +1,6 @@
+# REQUIREMENTS:
+# PHP_CodeSniffer (pyrus install pear/PHP_CodeSniffer)
+
 
 php --version;
 export PLUGIN_SLUG=$(basename $(pwd))
@@ -13,8 +16,7 @@ cp wp-tests-config-sample.php wp-tests-config.php
 sed -i bak "s/youremptytestdbnamehere/wordpress_unit_tests/" wp-tests-config.php
 sed -i bak "s/yourusernamehere/travis/" wp-tests-config.php
 sed -i bak "s/yourpasswordhere//" wp-tests-config.php
-pyrus install pear/PHP_CodeSniffer
-phpenv rehash
+
 mkdir /tmp/wpcs
 cd /tmp/wpcs
 git clone -b master https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git .
