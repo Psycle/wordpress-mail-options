@@ -23,20 +23,7 @@ fi
 
 php /tmp/composer.phar global require "phpunit/phpunit=5.0.*"
 
-if [ ! -d "$WP_TEST_DIR" ]; then
-    echo "Checking out WordPress from ${WORDPRESS_SVN_TRUNK}";
-    svn co $WORDPRESS_SVN_TRUNK $WP_TEST_DIR;
-fi
-svn revert -R $WP_TEST_DIR;
-cd $WP_TEST_DIR
-svn up;
 
-echo "Setting up database access";
-cp wp-tests-config-sample.php wp-tests-config.php
-sed -i bak "s/youremptytestdbnamehere/${WORDPRESS_DB_NAME}/" wp-tests-config.php
-sed -i bak "s/yourusernamehere/root/" wp-tests-config.php
-sed -i bak "s/yourpasswordhere/root/" wp-tests-config.php
-sed -i bak "s/localhost/127.0.0.1/" wp-tests-config.php
 
 if [ ! -d "/tmp/wpcs" ]; then
     echo "Installing wordpress coding standards";
@@ -47,27 +34,43 @@ if [ ! -d "/tmp/wpcs" ]; then
 fi
 
 for i in ${WP_VERSIONS[@]}; do
-    echo "Switching wordpress to tag ${i}";
-    cd $WP_TEST_DIR
-    svn switch "${WORDPRESS_SVN_TAGS}${i}"
+    export CURRENT_WP_TAG_DIR=${WP_TEST_DIR}_${i}
+    if [ ! -d "${CURRENT_WP_TAG_DIR}" ]; then
+        echo "Checking out wordpress tag ${i}";
+        svn co "${WORDPRESS_SVN_TAGS}${i}"  ${CURRENT_WP_TAG_DIR}
+    else
+        svn up ${CURRENT_WP_TAG_DIR};
+        echo "Updating wordpress tag ${i}";
+    fi
+    cd ${CURRENT_WP_TAG_DIR}
 
     echo "Copying plugin into wordpress installation."
-    rm -fr "${WP_TEST_DIR}/src/wp-content/plugins/$PLUGIN_SLUG";
-    cp -R $BASE_DIR "${WP_TEST_DIR}/src/wp-content/plugins/$PLUGIN_SLUG"
+    rm -fr "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG";
+    cp -R $BASE_DIR "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG"
 
     echo "Setting up database '${WORDPRESS_DB_NAME}'"
     mysql -Xv -e "DROP DATABASE IF EXISTS $WORDPRESS_DB_NAME;" -u $WORDPRESS_DB_USER -p$WORDPRESS_DB_PASS;
     mysql -Xv -e "CREATE DATABASE $WORDPRESS_DB_NAME;" -u $WORDPRESS_DB_USER -p$WORDPRESS_DB_PASS;
 
+    echo "Setting up database access";
+    cp wp-tests-config-sample.php wp-tests-config.php
+    sed -i bak "s/youremptytestdbnamehere/${WORDPRESS_DB_NAME}/" wp-tests-config.php
+    sed -i bak "s/yourusernamehere/root/" wp-tests-config.php
+    sed -i bak "s/yourpasswordhere/root/" wp-tests-config.php
+    sed -i bak "s/localhost/127.0.0.1/" wp-tests-config.php
+
+
     echo "Running tests."
-    cd "${WP_TEST_DIR}/src/wp-content/plugins/${PLUGIN_SLUG}/tests"
+    cd "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/${PLUGIN_SLUG}/tests"
 
     ~/.composer/vendor/bin/phpunit --version
-    ~/.composer/vendor/bin/phpunit
+    ~/.composer/vendor/bin/phpunit -v
 
     echo "Finished running tests."
+    rm -fr "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG";
+    echo "Removed plugin directory from wordpress plugins test folder"
 done
 
 cd $BASE_DIR
-phpcs --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
+phpcs -v --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
 exit 0;
