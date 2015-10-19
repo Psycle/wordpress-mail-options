@@ -1,0 +1,23 @@
+<phpunit
+        bootstrap="bootstrap.php"
+        backupGlobals="false"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        coverageHtml="./reports/coverage.html"
+        >
+    <testsuites>
+        <testsuite name="psycle_mail_options">
+            <directory prefix="test-" suffix=".php">./</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">../</directory>
+            <exclude>
+                <directory suffix=".php">../tests/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>
