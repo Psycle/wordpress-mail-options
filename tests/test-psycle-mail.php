@@ -104,32 +104,30 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 			// Capture the output.
 			ob_start();
 			$instance->callback_settings_field( $formFieldSettings );
-			// <phpunitroot> is added to allow us to use the XML assertion functions. We're not currently using these but should leave this in for future use.
-			$field = '<phpunitroot>' . ob_get_contents() . '</phpunitroot>';
+			$field = ob_get_contents();
 			ob_end_clean();
 
 			switch ( $name ) {
 				case 'from':
-					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'from" value="webmaster@example.org" size="60"><p class="description">The From email address for the message.</p></phpunitroot>';
+					$expected = '<input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'from" value="webmaster@' . $instance->get_default_mail_domain() . '" size="60"><p class="description">The From email address for the message.</p>';
 					break;
 				case 'from_name':
-					$expected = '<phpunitroot><input type="text" name="' . MailOptions::get_instance()->get_option_prefix() . 'from_name" value="Webmaster at example.org" size="60"><p class="description">The From name of the message.</p></phpunitroot>';
+					$expected = '<input type="text" name="' . MailOptions::get_instance()->get_option_prefix() . 'from_name" value="Webmaster at ' . $instance->get_default_mail_domain() . '" size="60"><p class="description">The From name of the message.</p>';
 					break;
 				case 'return_path':
-					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'return_path" value="webmaster@example.org" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p></phpunitroot>';
+					$expected = '<input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'return_path" value="webmaster@' . $instance->get_default_mail_domain() . '" size="60"><p class="description">The Return-Path of the message.&lt;br&gt;If empty, it will be set to either From or Sender.</p>';
 					break;
 				case 'sender':
-					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'sender" value="webmaster@example.org" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p></phpunitroot>';
+					$expected = '<input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'sender" value="webmaster@' . $instance->get_default_mail_domain() . '" size="60"><p class="description">The Sender email (Return-Path) of the message. &lt;br&gt;If not empty, will be sent via -f to sendmail or as &#039;MAIL FROM&#039; in smtp mode. This will become the &#039;Reply-To&#039; address if one isn&#039;t already set.</p>';
 					break;
 				case 'reply_to_name':
-					$expected = '<phpunitroot><input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'reply_to_name" value="" size="60"><p class="description">This will become the &#039;Reply-To&#039; name if one isn&#039;t already set.</p></phpunitroot>';
+					$expected = '<input type="email" name="' . MailOptions::get_instance()->get_option_prefix() . 'reply_to_name" value="" size="60"><p class="description">This will become the &#039;Reply-To&#039; name if one isn&#039;t already set.</p>';
 					break;
 				case 'textarea_test':
-					$expected = '<phpunitroot><textarea name="' . MailOptions::get_instance()->get_option_prefix() . 'textarea_test"></textarea><p class="description">Testing text area field</p></phpunitroot>';
+					$expected = '<textarea name="' . MailOptions::get_instance()->get_option_prefix() . 'textarea_test"></textarea><p class="description">Testing text area field</p>';
 					break;
 			}
 			$this->assertEquals( $expected,$field );
-			// $this->assertXmlStringEqualsXmlString($expected, $field); Ideally we would use this but it won't check HTML5 self closing tags.
 		}
 	}
 
@@ -259,8 +257,8 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$mailOptions->action_php_mailerinit( $phpMailer );
 		$headers = $phpMailer->createHeader();
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at example.org" <validsender@example.org>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at example.org" <webmaster@example.org>', $headers );
+		$this->assertContains( 'From: "Webmaster at ' . $mailOptions->get_default_mail_domain() . '" <' . $this->validEmailOne . '>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at ' . $mailOptions->get_default_mail_domain() . '" <webmaster@' . $mailOptions->get_default_mail_domain() . '>', $headers );
 	}
 
 	/**
@@ -278,8 +276,8 @@ class MailOptionsTest extends PHPUnit_Framework_TestCase {
 		$headers = $phpMailer->createHeader();
 
 		$this->assertEquals( $this->validEmailOne, $phpMailer->Sender );
-		$this->assertContains( 'From: "Webmaster at example.org" <validsender@example.org>', $headers );
-		$this->assertContains( 'Reply-To: "Webmaster at example.org" <webmaster@example.org>', $headers );
+		$this->assertContains( 'From: "Webmaster at ' . $mailOptions->get_default_mail_domain() . '" <' . $this->validEmailOne . '>', $headers );
+		$this->assertContains( 'Reply-To: "Webmaster at ' . $mailOptions->get_default_mail_domain() . '" <webmaster@' . $mailOptions->get_default_mail_domain() . '>', $headers );
 	}
 
 	/**
