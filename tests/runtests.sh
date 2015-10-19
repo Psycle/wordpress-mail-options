@@ -85,6 +85,14 @@ for i in ${WP_VERSIONS[@]}; do
     echo " "
 done
 
+title="| Running phpcs on ${BASE_DIR} |"
+size=${#title}
+printf %${size}s |tr " " "="
+echo " "
+echo $title
+printf %${size}s |tr " " "="
+echo " "
+
 cd $BASE_DIR
 phpcs -v --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
 exit 0;
