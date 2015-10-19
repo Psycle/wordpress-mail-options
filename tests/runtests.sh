@@ -1,3 +1,5 @@
+cd $(pwd)/$(dirname $0);
+
 php --version;
 export PLUGIN_DIR=$(pwd);
 export PLUGIN_SLUG=$(basename $(pwd));
@@ -15,4 +17,3 @@ sed -i bak "s/localhost/127\.0\.0\.1/" wp-tests-config.php;
 cd $PLUGIN_DIR/tests;
 
 phpunit;
-
