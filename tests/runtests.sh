@@ -1,7 +1,7 @@
+#!/bin/bash
 # REQUIREMENTS:
 # PHP_CodeSniffer (pyrus install pear/PHP_CodeSniffer)
-
-
+clear
 php --version;
 export BASE_DIR=$(pwd)
 export WP_TEST_DIR=/tmp/wordpress;
@@ -34,6 +34,13 @@ if [ ! -d "/tmp/wpcs" ]; then
 fi
 
 for i in ${WP_VERSIONS[@]}; do
+    title="| Testing plugin on WordPress v${i} |"
+    size=${#title}
+    printf %${size}s |tr " " "="
+    echo " "
+    echo $title
+    printf %${size}s |tr " " "="
+    echo " "
     export CURRENT_WP_TAG_DIR=${WP_TEST_DIR}_${i}
     if [ ! -d "${CURRENT_WP_TAG_DIR}" ]; then
         echo "Checking out wordpress tag ${i}";
@@ -69,6 +76,13 @@ for i in ${WP_VERSIONS[@]}; do
     echo "Finished running tests."
     rm -fr "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG";
     echo "Removed plugin directory from wordpress plugins test folder"
+    title="| End of testing plugin on WordPress v${i} |"
+    size=${#title}
+    printf %${size}s |tr " " "="
+    echo " "
+    echo $title
+    printf %${size}s |tr " " "="
+    echo " "
 done
 
 cd $BASE_DIR
