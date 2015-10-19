@@ -13,5 +13,6 @@ sed -i bak "s/yourusernamehere/root/" wp-tests-config.php;
 sed -i bak "s/yourpasswordhere/root/" wp-tests-config.php;
 sed -i bak "s/localhost/127\.0\.0\.1/" wp-tests-config.php;
 cd $PLUGIN_DIR/tests;
+
 phpunit;
 
