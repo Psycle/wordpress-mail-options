@@ -14,7 +14,7 @@ export WORDPRESS_SVN_BRANCHES="https://develop.svn.wordpress.org/branches/";
 export WORDPRESS_DB_NAME=wptests;
 export WORDPRESS_DB_USER=root;
 export WORDPRESS_DB_PASS=root;
-
+exitcode=0;
 
 if [ ! -f /tmp/composer.phar ]; then
     cd /tmp
@@ -42,13 +42,17 @@ for i in ${WP_VERSIONS[@]}; do
     printf %${size}s |tr " " "="
     echo " "
     export CURRENT_WP_TAG_DIR=${WP_TEST_DIR}_${i}
+    export WP_TESTS_DIR="${CURRENT_WP_TAG_DIR}/tests/phpunit"
+    echo "Checking ${CURRENT_WP_TAG_DIR} for wordpress"
     if [ ! -d "${CURRENT_WP_TAG_DIR}" ]; then
         echo "Checking out wordpress tag ${i}";
-        svn co "${WORDPRESS_SVN_TAGS}${i}"  ${CURRENT_WP_TAG_DIR}
+        mkdir -p ${CURRENT_WP_TAG_DIR}
+        cd ${CURRENT_WP_TAG_DIR}
+        svn co "${WORDPRESS_SVN_TAGS}${i}" .
     else
-        svn up ${CURRENT_WP_TAG_DIR};
-        echo "Updating wordpress tag ${i}";
+        echo "Found WordPress v${i}"
     fi
+
     cd ${CURRENT_WP_TAG_DIR}
 
     echo "Copying plugin into wordpress installation."
@@ -73,6 +77,10 @@ for i in ${WP_VERSIONS[@]}; do
     ~/.composer/vendor/bin/phpunit --version
     ~/.composer/vendor/bin/phpunit -v
 
+    if [ $? != 0 ]; then
+        exitcode=1
+    fi
+
     echo "Finished running tests."
     rm -fr "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG";
     echo "Removed plugin directory from wordpress plugins test folder"
@@ -95,4 +103,10 @@ echo " "
 
 cd $BASE_DIR
 phpcs -v --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
-exit 0;
+
+if [ $? != 0 ]; then
+exitcode=1
+fi
+
+
+exit $exitcode;
