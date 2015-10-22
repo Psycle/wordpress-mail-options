@@ -13,7 +13,7 @@ function display_title {
 clear
 
 export BASE_DIR=$(pwd)
-export WP_TEST_DIR=/tmp/wordpress/wordpress;
+export WP_TEST_DIR=$HOME/.wordpress_tests/wordpress;
 export PLUGIN_SLUG=$(basename $(pwd))
 
 export TEST_BINARIES_DIRECTORY="/tmp/unit_tests/"
@@ -28,6 +28,10 @@ export WORDPRESS_SVN_BRANCHES="https://develop.svn.wordpress.org/branches/";
 
 if [ -z $CI_BUILD_ID ]; then
     export CI_BUILD_ID=localbuild
+fi
+
+if [ -z $WORDPRESS_TESTS_PHPBINARY ]; then
+    export $WORDPRESS_TESTS_PHPBINARY="/usr/bin/env php"
 fi
 
 if [ -z $WORDPRESS_TESTS_VERSIONS ]; then
@@ -55,6 +59,12 @@ if [ -z $WORDPRESS_TESTS_DB_PASS ]; then
     export WORDPRESS_TESTS_DB_PASS=root
 fi
 
+if [ $WORDPRESS_TESTS_DB_PASS == "nopass" ]; then
+    export WORDPRESS_TESTS_DB_PASS_ARG=""
+else    
+    export WORDPRESS_TESTS_DB_PASS_ARG="-p${WORDPRESS_TESTS_DB_PASS}"
+fi
+
 exitcode=0;
 php --version;
 
@@ -68,7 +78,7 @@ if [ ! -f "${TEST_BINARIES_DIRECTORY}/composer.phar" ]; then
     cd ${TEST_BINARIES_DIRECTORY}
     curl -sS https://getcomposer.org/installer | php
 else
-    php ${COMPOSER_PHAR} self-update
+    $WORDPRESS_TESTS_PHPBINARY ${COMPOSER_PHAR} self-update
 fi
 
 # Create the directory for our composer packages.
@@ -78,7 +88,7 @@ fi
 
 cp ${BASE_DIR}/tests/test_composer.json ${COMPOSER_PACKAGE_DIR}/composer.json
 cd ${COMPOSER_PACKAGE_DIR}
-php ${COMPOSER_PHAR} update
+$WORDPRESS_TESTS_PHPBINARY ${COMPOSER_PHAR} update
 ${PHPCS_BINARY} --config-set installed_paths ${COMPOSER_PACKAGE_DIR}vendor/wp-coding-standards/wpcs
 
 for i in ${WORDPRESS_TESTS_VERSIONS[@]}; do
@@ -94,6 +104,10 @@ for i in ${WORDPRESS_TESTS_VERSIONS[@]}; do
         mkdir -p ${CURRENT_WP_TAG_DIR}
         cd ${CURRENT_WP_TAG_DIR}
         svn co "${WORDPRESS_SVN_TAGS}${i}" .
+		if [ $? != 0 ]; then
+			echo "Failed to check out WordPress tag from ${WORDPRESS_SVN_TAGS}${i}"
+			exit 1
+		fi
     else
         echo "Found WordPress v${i}"
     fi
@@ -105,12 +119,12 @@ for i in ${WORDPRESS_TESTS_VERSIONS[@]}; do
     cp -R $BASE_DIR "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/$PLUGIN_SLUG"
 
     echo "Setting up database '${WORDPRESS_TESTS_CURRENT_DB_NAME}'"
-    mysql -Xv -e "DROP DATABASE IF EXISTS $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u$WORDPRESS_TESTS_DB_USER -p$WORDPRESS_TESTS_DB_PASS;
+    mysql -Xv -e "DROP DATABASE IF EXISTS $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u$WORDPRESS_TESTS_DB_USER $WORDPRESS_TESTS_DB_PASS_ARG;
     if [ $? != 0 ]; then
         display_title "Failed to drop database. Test script failed."
         exit 1;
     fi
-    mysql -Xv -e "CREATE DATABASE $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u $WORDPRESS_TESTS_DB_USER -p$WORDPRESS_TESTS_DB_PASS;
+    mysql -Xv -e "CREATE DATABASE $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u $WORDPRESS_TESTS_DB_USER $WORDPRESS_TESTS_DB_PASS_ARG;
     if [ $? != 0 ]; then
         display_title "Failed to create database. Test script failed."
         exit 1;
@@ -119,17 +133,27 @@ for i in ${WORDPRESS_TESTS_VERSIONS[@]}; do
     # Set up the WordPress database config.
     echo "Setting up database access";
     cp wp-tests-config-sample.php wp-tests-config.php
-    sed -i bak "s/youremptytestdbnamehere/${WORDPRESS_TESTS_CURRENT_DB_NAME}/" wp-tests-config.php
-    sed -i bak "s/yourusernamehere/${WORDPRESS_TESTS_DB_USER}/" wp-tests-config.php
-    sed -i bak "s/yourpasswordhere/${WORDPRESS_TESTS_DB_PASS}/" wp-tests-config.php
-    sed -i bak "s/localhost/${WORDPRESS_TESTS_DB_HOST}/" wp-tests-config.php
+    
+    export SED_VERSION_STRING=$(sed --version)
+    
+    if echo "$SED_VERSION_STRING" | grep -e "GNU"
+    then
+        export SED_BACKUP_EXTENSION='';
+    else
+        export SED_BACKUP_EXTENSION='bak';
+    fi
+
+    sed -i $SED_BACKUP_EXTENSION "s/youremptytestdbnamehere/${WORDPRESS_TESTS_CURRENT_DB_NAME}/" wp-tests-config.php
+    sed -i $SED_BACKUP_EXTENSION "s/yourusernamehere/${WORDPRESS_TESTS_DB_USER}/" wp-tests-config.php
+    sed -i $SED_BACKUP_EXTENSION "s/yourpasswordhere/${WORDPRESS_TESTS_DB_PASS}/" wp-tests-config.php
+    sed -i $SED_BACKUP_EXTENSION "s/localhost/${WORDPRESS_TESTS_DB_HOST}/" wp-tests-config.php
 
     # Run the unit tests
     echo "Running tests."
     cd "${CURRENT_WP_TAG_DIR}/src/wp-content/plugins/${PLUGIN_SLUG}/tests"
 
-    ${PHPUNIT_BINARY} --version
-    ${PHPUNIT_BINARY} -v
+    $WORDPRESS_TESTS_PHPBINARY ${PHPUNIT_BINARY} --version
+    $WORDPRESS_TESTS_PHPBINARY ${PHPUNIT_BINARY} -v
 
     if [ $? != 0 ]; then
         exitcode=1
@@ -142,13 +166,13 @@ for i in ${WORDPRESS_TESTS_VERSIONS[@]}; do
     display_title "End of testing plugin on WordPress v${i}"
 
     # Drop the test database
-    mysql -Xv -e "DROP DATABASE IF EXISTS $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u$WORDPRESS_TESTS_DB_USER -p$WORDPRESS_TESTS_DB_PASS;
+    mysql -Xv -e "DROP DATABASE IF EXISTS $WORDPRESS_TESTS_CURRENT_DB_NAME;" -h ${WORDPRESS_TESTS_DB_HOST} -u$WORDPRESS_TESTS_DB_USER $WORDPRESS_TESTS_DB_PASS_ARG;
 done
 
 display_title "Running phpcs on ${PLUGIN_SLUG}"
 
 cd $BASE_DIR
-${PHPCS_BINARY} --ignore=./vendor -v --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
+$WORDPRESS_TESTS_PHPBINARY ${PHPCS_BINARY} --ignore=./vendor -v --standard=WordPress --colors -d error_reporting=0 --extensions=php -n .
 
 if [ $? != 0 ]; then
 exitcode=1

@@ -1,0 +1,7 @@
+{
+  "require": {
+    "phpunit/phpunit": "*",
+    "squizlabs/php_codesniffer": "*",
+    "wp-coding-standards/wpcs": "dev-master"
+  }
+}
